@@ -41,15 +41,11 @@ def get_test_input(input_dim, CUDA):
     num_classes
     return img_
 
-
-
 def arg_parse():
     """
     Parse arguements to the detect module
-    
     """
-    
-    
+
     parser = argparse.ArgumentParser(description='YOLO v3 Detection Module')
    
     parser.add_argument("--images", dest = 'images', help = 
@@ -72,7 +68,6 @@ def arg_parse():
                         default = "416", type = str)
     parser.add_argument("--scales", dest = "scales", help = "Scales to use for detection",
                         default = "1,2,3", type = str)
-    
     return parser.parse_args()
 
 if __name__ ==  '__main__':
@@ -108,6 +103,7 @@ if __name__ ==  '__main__':
     print("Network successfully loaded")
     
     model.net_info["height"] = args.reso
+    # image dim
     inp_dim = int(model.net_info["height"])
     assert inp_dim % 32 == 0 
     assert inp_dim > 32
@@ -115,8 +111,7 @@ if __name__ ==  '__main__':
     #If there's a GPU availible, put the model on GPU
     if CUDA:
         model.cuda()
-    
-    
+
     #Set the model in evaluation mode
     model.eval()
     
@@ -135,15 +130,16 @@ if __name__ ==  '__main__':
         os.makedirs(args.det)
         
     load_batch = time.time()
-    
+
+    # (tensor, ndarray, (335,500))
+    # img_, orig_im, dim
     batches = list(map(prep_image, imlist, [inp_dim for x in range(len(imlist))]))
+    
     im_batches = [x[0] for x in batches]
     orig_ims = [x[1] for x in batches]
     im_dim_list = [x[2] for x in batches]
     im_dim_list = torch.FloatTensor(im_dim_list).repeat(1,2)
-    
-    
-    
+
     if CUDA:
         im_dim_list = im_dim_list.cuda()
     
@@ -168,15 +164,12 @@ if __name__ ==  '__main__':
     start_det_loop = time.time()
     
     objs = {}
-    
-    
-    
+
     for batch in im_batches:
         #load the image 
         start = time.time()
         if CUDA:
             batch = batch.cuda()
-        
 
         #Apply offsets to the result predictions
         #Tranform the predictions as described in the YOLO paper
@@ -205,25 +198,14 @@ if __name__ ==  '__main__':
             continue
 
         end = time.time()
-        
-                    
-#        print(end - start)
-
-            
 
         prediction[:,0] += i*batch_size
-        
-    
-            
-          
+
         if not write:
             output = prediction
             write = 1
         else:
             output = torch.cat((output,prediction))
-            
-        
-        
 
         for im_num, image in enumerate(imlist[i*batch_size: min((i +  1)*batch_size, len(imlist))]):
             im_id = i*batch_size + im_num
@@ -233,7 +215,6 @@ if __name__ ==  '__main__':
             print("----------------------------------------------------------")
         i += 1
 
-        
         if CUDA:
             torch.cuda.synchronize()
     
@@ -250,8 +231,6 @@ if __name__ ==  '__main__':
     
     output[:,[1,3]] -= (inp_dim - scaling_factor*im_dim_list[:,0].view(-1,1))/2
     output[:,[2,4]] -= (inp_dim - scaling_factor*im_dim_list[:,1].view(-1,1))/2
-    
-    
     
     output[:,1:5] /= scaling_factor
     
@@ -307,11 +286,4 @@ if __name__ ==  '__main__':
     print("{:25s}: {:2.3f}".format("Average time_per_img", (end - load_batch)/len(imlist)))
     print("----------------------------------------------------------")
 
-    
     torch.cuda.empty_cache()
-    
-    
-        
-        
-    
-    

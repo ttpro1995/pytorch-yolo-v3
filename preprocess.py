@@ -31,7 +31,8 @@ def letterbox_image(img, inp_dim):
 def prep_image(img, inp_dim):
     """
     Prepare image for inputting to the neural network. 
-    
+    :param img
+    :param inp_dim int(model.net_info["height"]) 416
     Returns a Variable 
     """
 
