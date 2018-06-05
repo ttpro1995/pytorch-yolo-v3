@@ -205,6 +205,7 @@ if __name__ ==  '__main__':
             output = prediction
             write = 1
         else:
+            # id coord_hor coord_ver coord_hor coord_ver conf classes
             output = torch.cat((output,prediction))
 
         for im_num, image in enumerate(imlist[i*batch_size: min((i +  1)*batch_size, len(imlist))]):
@@ -225,10 +226,11 @@ if __name__ ==  '__main__':
         exit()
         
     im_dim_list = torch.index_select(im_dim_list, 0, output[:,0].long())
-    
+
+    # scaling factor = model input dim / image dim
     scaling_factor = torch.min(inp_dim/im_dim_list,1)[0].view(-1,1)
     
-    
+
     output[:,[1,3]] -= (inp_dim - scaling_factor*im_dim_list[:,0].view(-1,1))/2
     output[:,[2,4]] -= (inp_dim - scaling_factor*im_dim_list[:,1].view(-1,1))/2
     
