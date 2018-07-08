@@ -1,4 +1,4 @@
-from pip.req.req_file import preprocess
+# from pip.req.req_file import preprocess
 
 from detect import *
 from preprocess import *
@@ -130,6 +130,6 @@ if __name__ == "__main__":
     print("start")
     yolo = YoloWrapper()
     result, result_img = yolo.predict("imgs/dog.jpg")
-    cv2.imwrite("meow/dogpred.jpg", result_img)
+    cv2.imwrite("aaaaaaa.jpg", result_img)
     print("yo")
     print(result)
