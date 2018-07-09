@@ -18,8 +18,8 @@ def draw_box(x, results):
     cv2.putText(img, label, (c1[0], c1[1] + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225, 255, 255], 1)
     return img
 
-class YoloWrapper():
 
+class YoloWrapper():
 
     def __init__(self):
         """
