@@ -1,4 +1,4 @@
-from yolo_wrapper import YoloWrapper
+from .yolo_wrapper import YoloWrapper
 
 
 class SingletonYoloWrapper:
