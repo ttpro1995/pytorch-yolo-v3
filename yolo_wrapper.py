@@ -1,7 +1,7 @@
 # from pip.req.req_file import preprocess
 
-from .detect import *
-from .preprocess import *
+from detect import *
+from preprocess import *
 
 
 def draw_box(x, results):
