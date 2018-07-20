@@ -4,19 +4,19 @@ from detect import *
 from preprocess import *
 
 
-def draw_box(x, results):
-    c1 = tuple(x[1:3].int())
-    c2 = tuple(x[3:5].int())
-    img = results[int(x[0])]
-    cls = int(x[-1])
-    label = "{0}".format(classes[cls])
-    color = random.choice(colors)
-    cv2.rectangle(img, c1, c2, color, 1)
-    t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1, 1)[0]
-    c2 = c1[0] + t_size[0] + 3, c1[1] + t_size[1] + 4
-    cv2.rectangle(img, c1, c2, color, -1)
-    cv2.putText(img, label, (c1[0], c1[1] + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225, 255, 255], 1)
-    return img
+# def draw_box(x, results):
+#     c1 = tuple(x[1:3].int())
+#     c2 = tuple(x[3:5].int())
+#     img = results[int(x[0])]
+#     cls = int(x[-1])
+#     label = "{0}".format(classes[cls])
+#     color = random.choice(colors)
+#     cv2.rectangle(img, c1, c2, color, 1)
+#     t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1, 1)[0]
+#     c2 = c1[0] + t_size[0] + 3, c1[1] + t_size[1] + 4
+#     cv2.rectangle(img, c1, c2, color, -1)
+#     cv2.putText(img, label, (c1[0], c1[1] + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225, 255, 255], 1)
+#     return img
 
 
 class YoloWrapper():
@@ -64,6 +64,7 @@ class YoloWrapper():
 
         model.net_info["height"] = args.reso
         self.inp_dim = int(model.net_info["height"])
+        print(self.inp_dim)  # inp_dim = 416
         assert self.inp_dim % 32 == 0
         assert self.inp_dim > 32
 
@@ -79,6 +80,11 @@ class YoloWrapper():
         self.CUDA = CUDA
 
     def predict(self, img_path):
+        """
+
+        :param img_path: path to input image
+        :return: prediction matrix , image matrix. Use cv2 to write image to file
+        """
         CUDA = self.CUDA
         img, orig_im, im_dim = prep_image(img_path, self.inp_dim)
         # img: 1, 3, 416, 416
@@ -97,6 +103,8 @@ class YoloWrapper():
         if CUDA:
             torch.cuda.synchronize()
 
+        # scale to fix original image
+
         scaling_factor_horizontal = self.inp_dim / im_dim[0]
         scaling_factor_vertical = self.inp_dim / im_dim[1]
 
@@ -113,6 +121,12 @@ class YoloWrapper():
         return output, result_img
 
     def draw_predict(self, x, result):
+        """
+        draw class name and bouding box on image
+        :param x: output row format 0, coord1, coord2, coord3, coord4, xxx, xxx, class_id
+        :param result: original image to draw on
+        :return:
+        """
         c1 = tuple(x[1:3].int())
         c2 = tuple(x[3:5].int())
         img = result
@@ -133,3 +147,4 @@ if __name__ == "__main__":
     cv2.imwrite("aaaaaaa.jpg", result_img)
     print("yo")
     print(result)
+    # print(result_img)
